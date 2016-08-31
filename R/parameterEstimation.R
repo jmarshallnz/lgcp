@@ -226,6 +226,11 @@ spatialparsEst <- function(gk,sigma.range,phi.range,spatial.covmodel,covpars=c()
         return(panel)
     }
 
+    # function for retrieving class name from spatstat object
+    get_class <- function(gk) {
+      return(paste(attr(gk,"fname"), collapse=":"))
+    }
+
     corchoice <- c() # to get rid of 'no visible binding' messages on checking
     sigma <- c()
     phi <- c()
@@ -239,7 +244,7 @@ spatialparsEst <- function(gk,sigma.range,phi.range,spatial.covmodel,covpars=c()
     
     env <- NULL
 
-    if (attr(gk,"fname") == "g[inhom]"){ 
+    if (get_class(gk) == "g:inhom"){
         panfun <- function(p){ 
             env <<- environment()           
             r <- gk$r            
@@ -258,7 +263,7 @@ spatialparsEst <- function(gk,sigma.range,phi.range,spatial.covmodel,covpars=c()
             return(p)
         }
     }
-    else if (attr(gk,"fname") == "K[inhom]"){
+    else if (get_class(gk) == "K:inhom"){
         panfun <- function(p){
             env <<- environment()
             r <- gk$r
@@ -289,17 +294,17 @@ spatialparsEst <- function(gk,sigma.range,phi.range,spatial.covmodel,covpars=c()
     pancontrol <- rp.control("Parameter Estimation",aschar=FALSE)
     ##rp.radiogroup(pancontrol,var=corchoice,values=c("exponential","matern","whittle"),action=panfun,initval="exponential")
     
-    if (attr(gk,"fname") == "g[inhom]"){ 
+    if (get_class(gk) == "g:inhom"){ 
         rp.radiogroup(pancontrol,variable=transform,vals=c("none","log"),action=panfun,initval="none")
     }    
-    else if (attr(gk,"fname") == "K[inhom]"){
+    else if (get_class(gk) == "K:inhom"){
         rp.radiogroup(pancontrol,variable=transform,vals=c("none","^1/4"),action=panfun,initval="^1/4")
     }
 
     # "quick" optimiser to get poor initial values for sigma and phi
     r <- gk$r
     if(guess){
-        if (attr(gk,"fname") == "g[inhom]"){
+        if (get_class(gk) == "g:inhom"){
             spfun <- function(sigmaphi){
                 egr <- suppressWarnings(exp(sapply(r,gu,sigma=sigmaphi[1],phi=sigmaphi[2],model=spatial.covmodel,additionalparameters=covpars))-1)
                 S <- suppressWarnings((egr-gk[[idx]])^2)
@@ -314,7 +319,7 @@ spatialparsEst <- function(gk,sigma.range,phi.range,spatial.covmodel,covpars=c()
             sigmainit <- ops$par[1]
             phiinit <- ops$par[2]
         }
-        else if (attr(gk,"fname") == "K[inhom]"){
+        else if (get_class(gk) == "K:inhom"){
             sigphifun <- function(sigphi){
                 egr <- suppressWarnings(exp(sapply(r,gu,sigma=sigphi[1],phi=sigphi[2],model=spatial.covmodel,additionalparameters=covpars))-1)    
                 rdiff <- diff(r[1:2]) # do the integral on the discrete partition of r given by Kinhom
