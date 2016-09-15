@@ -280,7 +280,8 @@ spatialparsEst <- function(gk,sigma.range,phi.range,spatial.covmodel,covpars=c()
                     kest <- kest^(1/4)
                 }                
             }            
-            plot(NULL,main="K[inhom]",xlim=c(0,max(r,na.rm=TRUE)),ylim=c(0,max(c(gvals[!is.infinite(gvals)],kest[!is.infinite(kest)]))),xlab="r",ylab="K_inhom(r)",sub=paste(spatial.covmodel,"covariance function"))
+            # ylim was 0,max(c(gvals[!is.infinite(gvals)],kest[!is.infinite(kest)])))
+            plot(NULL,main="K[inhom]",xlim=c(0,max(r,na.rm=TRUE)),ylim=c(0,1),xlab="r",ylab="K_inhom(r)",sub=paste(spatial.covmodel,"covariance function"))
             lines(r,gvals)           
             lines(r,kest,col="orange")
             legend("topleft",lty=c("solid","solid"),col=c("black","orange"),legend=c("Empirical","Theoretical"))
