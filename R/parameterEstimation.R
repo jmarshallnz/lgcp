@@ -256,7 +256,8 @@ spatialparsEst <- function(gk,sigma.range,phi.range,spatial.covmodel,covpars=c()
                     egr <- log(egr)
                 }               
             } 
-            plot(NULL,main="g[inhom]",xlim=c(0,max(r,na.rm=TRUE)),ylim=c(0,max(c(gvals[!is.infinite(gvals)&!is.nan(gk[[idx]])],egr[!is.infinite(egr)&!is.nan(egr)]))),xlab="r",ylab="g_inhom(r)",sub=paste(spatial.covmodel,"covariance function"))
+            #max(c(gvals[!is.infinite(gvals)&!is.nan(gk[[idx]])],egr[!is.infinite(egr)&!is.nan(egr)])))
+            plot(NULL,main="g[inhom]",xlim=c(0,max(r,na.rm=TRUE)),ylim=c(0,1000),xlab="r",ylab="g_inhom(r)",sub=paste(spatial.covmodel,"covariance function"))
             lines(r,gvals)
             lines(r,egr,col="orange")
             legend("topright",lty=c("solid","solid"),col=c("black","orange"),legend=c("Empirical","Theoretical"))
@@ -267,7 +268,10 @@ spatialparsEst <- function(gk,sigma.range,phi.range,spatial.covmodel,covpars=c()
         panfun <- function(p){
             env <<- environment()
             r <- gk$r
-            egr <- suppressWarnings(exp(sapply(r,gu,sigma=p$sigma,phi=p$phi,model=spatial.covmodel,additionalparameters=covpars))-1)    
+            
+
+            egr <- suppressWarnings(exp(sapply(r,gu,sigma=p$sigma,phi=p$phi,model=spatial.covmodel,additionalparameters=covpars))-1)
+            print(egr)
             rdiff <- diff(r[1:2]) # do the integral on the discrete partition of r given by Kinhom
             kest <- rdiff * egr[1] * 2 * pi * r[1]
             for(i in 2:length(r)){
@@ -281,7 +285,7 @@ spatialparsEst <- function(gk,sigma.range,phi.range,spatial.covmodel,covpars=c()
                 }                
             }            
             # ylim was 0,max(c(gvals[!is.infinite(gvals)],kest[!is.infinite(kest)])))
-            plot(NULL,main="K[inhom]",xlim=c(0,max(r,na.rm=TRUE)),ylim=c(0,1),xlab="r",ylab="K_inhom(r)",sub=paste(spatial.covmodel,"covariance function"))
+            plot(NULL,main="K[inhom]",xlim=c(0,max(r,na.rm=TRUE)),ylim=c(0,max(c(gvals[!is.infinite(gvals)],kest[!is.infinite(kest)]))),xlab="r",ylab="K_inhom(r)",sub=paste(spatial.covmodel,"covariance function"))
             lines(r,gvals)           
             lines(r,kest,col="orange")
             legend("topleft",lty=c("solid","solid"),col=c("black","orange"),legend=c("Empirical","Theoretical"))

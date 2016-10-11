@@ -2034,7 +2034,9 @@ touchingowin <- function(x, y, w){
         w <- as(w,"SpatialPolygons")
     }
     gri <- grid2spoly(x,y)
-    int <- !gDisjoint(w,gri,byid=TRUE) & !gTouches(w,gri,byid=TRUE) # cells that have some internal points in common
+    i1 <- !gDisjoint(w,gri,byid=TRUE)
+    i2 <- !gTouches(w,gri,byid=TRUE) # cells that have some internal points in common
+    int = i1 & i2
     return(apply(int,1,any))
 } 
 

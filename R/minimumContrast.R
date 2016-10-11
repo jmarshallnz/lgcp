@@ -532,6 +532,7 @@ minimum.contrast <- function(data,model,method="g",intens=NULL,power=1,transform
 
 minimum.contrast.spatiotemporal <- function(data,model,method="g",spatial.dens=NULL,temporal.intens=NULL,power=1,transform=NULL,spatial.startvals=NULL,temporal.interval=NULL,verbose=TRUE,...){
 	if(class(data)[1]!="stppp") stop("'data' must be an object of class 'stppp'")
+  cat("first obs")
 	W <- data$window
 	uni.t <- unique(data$t)
 	rec <- as.rectangle(W)
@@ -539,6 +540,7 @@ minimum.contrast.spatiotemporal <- function(data,model,method="g",spatial.dens=N
 	xc <- xs[1]+0.5*(xs[2]-xs[1])+0:127*(xs[2]-xs[1])
 	ys <- seq(W$yrange[1],W$yrange[2],length=129)
 	yc <- ys[1]+0.5*(ys[2]-ys[1])+0:127*(ys[2]-ys[1])
+	cat("got to first if")
 
 	if(data$markformat=="none"){
 		if(verbose) cat("[Univariate spatio-temporal minimum contrast]\n")
@@ -546,6 +548,7 @@ minimum.contrast.spatiotemporal <- function(data,model,method="g",spatial.dens=N
 		if(is.null(spatial.startvals)){
 			spatial.startvals <- c(min(diff(rec$xrange),diff(rec$yrange))/100,log(data$n)/2)
 		}
+	  cat("through mark formatting")
 		
 		if(is.null(temporal.intens)) temporal.intens <- temporalAtRisk(function(x) 1,data$tlim,data)
 		if(is.null(spatial.dens)) spatial.dens <- im(matrix(1,128,128),xcol=xc,yrow=yc)
@@ -553,6 +556,7 @@ minimum.contrast.spatiotemporal <- function(data,model,method="g",spatial.dens=N
 			if(is.im(spatial.dens)) spatial.dens <- spatialAtRisk(spatial.dens)
 			else stop("'spatial.dens' must be an object of class 'spatialAtRisk' or 'im'")
 		}					
+	  cat("through spatial intensity check")
 		if(!any(class(temporal.intens)=="temporalAtRisk")) stop("'temporal.intens' must be an intensity-scaled object of class 'temporalAtRisk'")	
 
 		if(method=="g"){
@@ -572,7 +576,7 @@ minimum.contrast.spatiotemporal <- function(data,model,method="g",spatial.dens=N
 			disc.vec <- sum((transform(nonpar$iso[-1])^power-transform(parametric)^power)^2)*nonpar$r[2]
 			if(verbose) cat("done.\n")
 		}
-		
+		cat("through K")
 		if(verbose) cat("Temporal: Covariance function estimation...")
 		uqt <- as.numeric(names(table(as.integer(data$t))))
 		tvals <- c()

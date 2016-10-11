@@ -270,6 +270,7 @@ lgcpPredict <- function(xyt,
 	
 	cat(paste("FFT Grid size: [",ext*M," , ",ext*N,"]\n",sep=""))
 	Sys.sleep(1)
+	start_time = proc.time()
     rm(ow)
     
     ###
@@ -292,6 +293,8 @@ lgcpPredict <- function(xyt,
     ################################################################
     # Create grid and FFT objects
     ################################################################   
+    
+    cat("Creating grid and FFT\n")
     
     study.region <- xyt$window
 	
@@ -340,6 +343,8 @@ lgcpPredict <- function(xyt,
 	}
 	
 	## OBTAIN SPATIAL VALS ON LATTICE (LINEAR INTERPOLATION) ##
+	cat("touchingowin stuff took", proc.time() - start_time, "\n")
+	cat("Spat values on lattice\n")
 	
 	if(is.null(missing.data.areas)){
     	spatialvals <- fftinterpolate(spatial,mcens,ncens,ext=ext)
@@ -367,6 +372,7 @@ lgcpPredict <- function(xyt,
         	spatialvals[[i]] <- spatialvals[[i]] / NC
 	    }
 	}
+	cat("spatial touchingowin stuff took us to", proc.time() - start_time, "\n")
 	
 	# compute the base matrix of the covariance matrix
     bcb <- blockcircbase(x=mcens,y=ncens,sigma=sigma,phi=phi,model=spatial.covmodel,additionalparameters=covpars)
@@ -377,7 +383,10 @@ lgcpPredict <- function(xyt,
     	
 	################################################################
 		
-	
+    cat("base matrix stuff took us to", proc.time() - start_time, "\n")
+    
+    cat("Setup MCMC\n")
+    
 		
     ###
     # Set up MCMC loop, required to compute nsamp, below
@@ -419,7 +428,7 @@ lgcpPredict <- function(xyt,
 	###
 	# Compute gradient truncation, if necessary
 	###
-    
+    cat("Up to compute gradient\n")
     if(is.null(gradtrunc)){
         gradtrunc <- computeGradtruncSpatioTemporal(nsims=100,
                                                     scale=1,
@@ -432,11 +441,13 @@ lgcpPredict <- function(xyt,
                                                     bt=bt,
                                                     cellarea=cellarea)
     }
-	
+    cat("gradient stuff took us to", proc.time() - start_time, "\n")
+    
 	###
 	# Run MALA
 	##
-	
+    cat("Running MALA\n")
+    
 	gridfun <- output.control$gridfunction
 	if (is.null(gridfun)){
 	    gridfun <- nullFunction()
@@ -473,7 +484,8 @@ lgcpPredict <- function(xyt,
                     ncens=ncens,
                     aggtimes=aggtimes)
                                                      
-	
+    cat("MALA DONE! took us to", proc.time() - start_time, "\n")
+    
 	endtime <- Sys.time()
 	timetaken <- endtime-starttime
 	
